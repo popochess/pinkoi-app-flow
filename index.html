@@ -1,0 +1,379 @@
+
+<!DOCTYPE html>
+ <html>
+ <head>
+  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <style type="text/css">
+    * {
+      font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+      font-weight: 300;
+      margin: 0;
+      padding: 0;
+
+    }
+    .language {
+
+    }
+    .flow-title {
+      display: block;
+      font-size: 30px;
+      padding-bottom: 24px;
+      padding-top: 45px;
+    }
+    .screenshot {
+      cursor: pointer;
+      border: 1px #EEE solid;
+      z-index: 0;
+    }
+
+    .container {height: 100%; width:100%; font-size: 0;}
+    #left, #right {display: inline-block;  zoom: 1; vertical-align: top; font-size: 12px;}
+
+    #left {
+      width: 20%;
+      /*background-color: black;*/
+    }
+    #right {
+      width: 70%;
+      /*background-color: coral;*/
+    }
+
+    .hide {
+      display: none;
+    }
+
+
+    .scrollable {
+      overflow: auto;
+      width:800px;
+      height: 100%;
+    }
+
+    th {
+      text-align: left;
+    }
+    td {
+      text-align: center;
+      min-width: 200px;
+    }
+
+    #overlay {
+      position:fixed;
+      top:0;
+      left:0;
+      background:rgba(0,0,0,0.8);
+      z-index:5;
+      width:100%;
+      height:100%;
+      display:none;
+      cursor: zoom-out;
+      text-align: center;
+    }
+    #imageDisplay {
+      height: auto;
+      width: auto;
+      z-index: 10;
+      cursor: pointer;
+    }
+    #imageInfo {
+      background: none repeat scroll 0 0 rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+      color: white;
+      margin: 20px;
+      padding: 10px;
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 250px;
+      z-index: -1;
+    }
+    #imageInfo:hover {
+      z-index: 20;
+    }
+
+    #localeSelect {
+      margin-left: 20px;
+      margin-top: 20px;
+    }
+
+    #deviceSelect {
+      margin-left: 20px;
+      margin-top: 20px;
+    }
+
+    #actionSelect {
+      margin-left: 20px;
+      margin-top: 20px;
+    }
+
+  </style>
+  <title>app flow</title>
+ </head>
+
+ <body>
+
+   <div id="left">
+   </div>
+
+   <div id="right">
+   </div>
+
+   <div id="overlay">
+     <img id="imageDisplay" src="" alt="" />
+     <div id="imageInfo"></div>
+   </div>
+   <script type="text/javascript">
+
+
+  let locales = ['zh-Hant','en','ja']//['en','zh-hant'];
+  let devices = ['iPhone_8','iPhone_X']//['iPhone_7','iPhone_8'];
+  let actions = ['Search','Login','Logout']//['launch','settings'];
+  let actionsCount = ['6','7','4'];
+
+
+
+  $('<select id="localeSelect"></select>').appendTo("#left");
+  $("<option/>", {value: "none", text: "all locale"}).appendTo("#localeSelect");
+  for (var i = 0; i < locales.length; i++) {
+
+    $("<option/>", {value: locales[i], text: locales[i]}).appendTo("#localeSelect");
+
+  }
+
+
+  $('<select id="deviceSelect"></select>').appendTo("#left");
+  $("<option/>", {value: "none", text: "all device"}).appendTo("#deviceSelect");
+  for (var i = 0; i < devices.length; i++) {
+    $("<option/>", {value: devices[i], text: devices[i]}).appendTo("#deviceSelect");
+  }
+
+
+  $('<select id="actionSelect"></select>').appendTo("#left");
+    $("<option/>", {value: "none", text: "all action"}).appendTo("#actionSelect");
+  for (var i = 0; i < actions.length; i++) {
+    $("<option/>", {value: actions[i], text: actions[i]}).appendTo("#actionSelect");
+  }
+
+
+
+
+  for(var i=0; i<locales.length; i++) {
+    for(var j=0; j<devices.length; j++) {
+      for(var k=0; k<actions.length; k++) {
+
+        var actionDiv = $('<div></div>').addClass("app-flow-action "+locales[i]+" "+devices[j]+" "+actions[k]);
+
+        var titleSpin = $('<span></span>').text(locales[i]+"/"+devices[j].replace('_',' ')+"/"+actions[k]).addClass('flow-title')
+
+        var table = $('<table></table>');
+        var scrollDiv = $('<div></div>').addClass('scrollable');
+        var tbody = $('<tbody></tbody>')
+        for(var z=0; z<actionsCount[k]; z++) {
+
+          var td = $('<td></td>')
+          var img = $('<img/>',{
+            class: "screenshot", //"new-app-flow-action "+locales[i]+" "+devices[j]+" "+actions[k]
+            src: "images/"+locales[i]+"/"+devices[j].replace('_',' ')+"-"+actions[k]+"-"+z+".png",
+            style:"width:250px;"
+          });  //.appendTo('#right');
+          td.append(img);
+
+          tbody.append(td);
+        }
+        table.append(tbody);
+
+        scrollDiv.append(table)
+
+        actionDiv.append(titleSpin)
+        actionDiv.append(scrollDiv)
+        actionDiv.appendTo('#right');
+      }
+    }
+  }
+
+     var overlay        = document.getElementById('overlay');
+     var imageDisplay   = document.getElementById('imageDisplay');
+     var imageInfo      = document.getElementById('imageInfo');
+     var screenshotLink = document.getElementsByClassName('screenshotLink');
+
+     function doClick(el) {
+       if (document.createEvent) {
+         var evObj = document.createEvent('MouseEvents', true);
+         evObj.initMouseEvent("click", false, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+         el.dispatchEvent(evObj);
+       } else if (document.createEventObject) { //IE
+         var evObj = document.createEventObject();
+         el.fireEvent('onclick', evObj);
+       }
+     }
+
+     for (index = 0; index < screenshotLink.length; ++index) {
+       screenshotLink[index].addEventListener('click', function(e) {
+         e.preventDefault();
+
+         var img = e.target;
+         if (e.target.tagName == 'A') {
+           img = e.target.children[0];
+         }
+
+         // beautify
+         var tmpImg = new Image();
+         tmpImg.src = img.src;
+         imageDisplay.style.height     = 'auto';
+         imageDisplay.style.width     = 'auto';
+         if (window.innerHeight < tmpImg.height) {
+           imageDisplay.style.height = document.documentElement.clientHeight+'px';
+         } else if (window.innerWidth < tmpImg.width) {
+           imageDisplay.style.width = document.documentElement.clientWidth;+'px';
+         } else {
+           imageDisplay.style.paddingTop = parseInt((window.innerHeight - tmpImg.height) / 2)+'px';
+         }
+
+         imageDisplay.src             = img.src;
+         imageDisplay.alt             = img.alt;
+         imageDisplay.dataset.counter = img.dataset.counter;
+
+         imageInfo.innerHTML          = '<h3>'+img.alt+'</h3>';
+         imageInfo.innerHTML         += decodeURI(img.src.split("/").pop());
+         imageInfo.innerHTML         += '<br />'+tmpImg.height+'&times;'+tmpImg.width+'px';
+
+         overlay.style.display        = "block";
+       });
+     }
+
+     imageDisplay.addEventListener('click', function(e) {
+       e.stopPropagation(); // !
+
+       overlay.style.display = "none";
+
+       img_counter = parseInt(e.target.dataset.counter) + 1;
+       try {
+         link = document.body.querySelector('img[data-counter="'+img_counter+'"]').parentNode;
+       } catch (e) {
+         try {
+           link = document.body.querySelector('img[data-counter="0"]').parentNode;
+         } catch (e) {
+           return false;
+         }
+       }
+       doClick(link);
+     });
+
+     overlay.addEventListener('click', function(e) {
+       overlay.style.display = "none";
+     })
+
+     function keyPressed(e) {
+     e = e || window.event;
+     var charCode = e.keyCode || e.which;
+     switch(charCode) {
+       case 27: // Esc
+         overlay.style.display = "none";
+         break;
+       case 34: // right-arrow, Page Down, keypad right, ...
+       case 39:
+       case 54:
+       case 102:
+         e.preventDefault();
+         doClick(imageDisplay);
+         break;
+       case 33: // left-arrow, Page Up, keypad right, ...
+       case 37:
+       case 52:
+       case 100:
+         e.preventDefault();
+         document.getElementById('imageDisplay').dataset.counter -= 2; // hacky
+         doClick(imageDisplay);
+         break;
+      }
+     };
+     document.body.addEventListener('keydown', keyPressed);
+
+     // select tag
+     var localeSelect = document.getElementById('localeSelect');
+     textbox = document.getElementById('myTextbox');
+
+     var deviceSelect = document.getElementById('deviceSelect');
+
+     var actionSelect = document.getElementById('actionSelect');
+
+
+
+     function onSelectChanged()
+     {
+       console.log(localeSelect.selectedIndex);
+       var actionId;
+
+
+      let selectedLocaleId = localeSelect[localeSelect.selectedIndex].value
+      let selectedDeviceId = deviceSelect[deviceSelect.selectedIndex].value
+      let selectedActionId = actionSelect[actionSelect.selectedIndex].value
+
+      var finalAllClassName = "";
+      if (selectedLocaleId != "none") {
+        finalAllClassName += "."
+        finalAllClassName += selectedLocaleId;
+      }
+
+      if (selectedDeviceId != "none") {
+        finalAllClassName += "."
+        finalAllClassName += selectedDeviceId;
+      }
+
+      if (selectedActionId != "none") {
+
+        finalAllClassName += "."
+        finalAllClassName += selectedActionId;
+      }
+
+      // hide all
+      if (finalAllClassName != "") {
+        let actionList = document.body.querySelectorAll(".app-flow-action")
+        for (var action of actionList) {
+          action.classList.add("hide");
+        }
+
+        console.log(finalAllClassName);
+        var results = document.body.querySelectorAll(finalAllClassName)
+        for (var result of results) {
+          result.classList.remove("hide");
+        }
+
+      } else {
+        let actionList = document.body.querySelectorAll(".app-flow-action")
+        for (var action of actionList) {
+          action.classList.remove("hide");
+        }
+      }
+
+     }
+
+     if (localeSelect.addEventListener){
+       localeSelect.addEventListener('change', onSelectChanged, false);
+     } else {
+       // !@#$ing IE support, of course
+       localeSelect.attachEvent('onchange', onSelectChanged, false);
+     }
+
+     if (deviceSelect.addEventListener){
+       deviceSelect.addEventListener('change', onSelectChanged, false);
+     } else {
+       // !@#$ing IE support, of course
+       deviceSelect.attachEvent('onchange', onSelectChanged, false);
+     }
+
+
+     if (actionSelect.addEventListener){
+       actionSelect.addEventListener('change', onSelectChanged, false);
+     } else {
+       // !@#$ing IE support, of course
+       actionSelect.attachEvent('onchange', onSelectChanged, false);
+     }
+
+   </script>
+
+</body>
+ </html>
